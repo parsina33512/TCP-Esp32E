@@ -92,7 +92,11 @@ def index():
             flash(f"❌ Error sending config to ESP32: {e}")
         return redirect(url_for('index'))
 
-    esp_config = {'localIP':'', 'gateway':'', 'subnet':'', 'serverIP':'', 'serverPort':'', 'modbusInterval':'', 'networkInterval':''}
+    esp_config = {
+        'localIP':'', 'gateway':'', 'subnet':'',
+        'serverIP':'', 'serverPort':'',
+        'modbusInterval':'', 'networkInterval':''
+    }
     try:
         cfg_resp = requests.get(f"http://{ESP32_IP}:{ESP32_PORT}/config", timeout=3)
         if cfg_resp.ok:
@@ -132,8 +136,18 @@ def fw_upload():
     if not file:
         flash("❌ No firmware file uploaded")
         return redirect(url_for('fw_form'))
+
+    # --- DEBUG: report incoming file size ---
+    content = file.read()
+    size = len(content)
+    print(f"[ FW_UPLOAD ] Received firmware file of {size} bytes")
+    file.stream.seek(0)
+
+    # save to temp
     temp_path = os.path.join('/tmp', file.filename)
     file.save(temp_path)
+    print(f"[ FW_UPLOAD ] Saved to {temp_path}")
+
     url = f"http://{ESP32_IP}:{ESP32_PORT}/update"
     try:
         with open(temp_path, 'rb') as f_data:
@@ -143,11 +157,14 @@ def fw_upload():
                 headers={"Content-Type": "application/octet-stream"},
                 timeout=60
             )
+        print(f"[ FW_UPLOAD ] ESP32 responded: {resp.status_code} {resp.text}")
     except Exception as e:
         flash(f"❌ Error forwarding to ESP32: {e}")
+        os.remove(temp_path)
         return redirect(url_for('fw_form'))
     finally:
         os.remove(temp_path)
+
     flash(f"ESP32 responded: {resp.status_code} {resp.text}")
     return redirect(url_for('fw_form'))
 
@@ -205,7 +222,11 @@ DASHBOARD_HTML = '''
 <body>
   <h1>BMS Monitoring System</h1>
   {% with messages = get_flashed_messages() %}
-    {% if messages %}<div class="flash-messages">{% for m in messages %}<div class="flash">{{ m }}</div>{% endfor %}</div>{% endif %}
+    {% if messages %}
+      <div class="flash-messages">
+        {% for m in messages %}<div class="flash">{{ m }}</div>{% endfor %}
+      </div>
+    {% endif %}
   {% endwith %}
   <div id="data-container"></div>
   <hr>
