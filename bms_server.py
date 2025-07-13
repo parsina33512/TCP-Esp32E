@@ -9,7 +9,7 @@ app.secret_key = os.urandom(24)
 received_data = []
 
 # ─── Where your ESP32 lives on the LAN (for sending config & firmware) ─
-ESP32_IP   = "192.168.100.65"
+ESP32_IP   = "192.168.100.85"
 ESP32_PORT = 80   # ESP32's EthernetServer is on port 80
 
 # ─────────────────────────────────────────────────────────────────────
@@ -81,7 +81,7 @@ def index():
         try:
             resp = requests.post(
                 f"http://{ESP32_IP}:{ESP32_PORT}/config",
-                json=new_config,
+                 data=new_config,
                 timeout=5
             )
             if resp.ok:
@@ -148,7 +148,8 @@ def fw_upload():
     file.save(temp_path)
     print(f"[ FW_UPLOAD ] Saved to {temp_path}")
 
-    url = f"http://{ESP32_IP}:{ESP32_PORT}/update"
+    # NEW - USES CORRECT OTA PORT 8080
+    url = f"http://{ESP32_IP}:8080/update"
     try:
         with open(temp_path, 'rb') as f_data:
             resp = requests.post(

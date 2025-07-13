@@ -12,15 +12,14 @@ app.config['JSON_SORT_KEYS'] = False
 CONFIG_FILE = 'device_config.json'
 DATA_DIR = 'data'
 os.makedirs(DATA_DIR, exist_ok=True)
-
 class DeviceConfig:
     def __init__(self):
         self.lock = threading.Lock()
         self.config = {
-            "localIP": "192.168.1.100",
-            "gateway": "192.168.1.1",
+            "localIP": "192.168.100.57",  # ESP32's new IP
+            "gateway": "192.168.100.1",
             "subnet": "255.255.255.0",
-            "serverIP": "192.168.1.200",
+            "serverIP": "192.168.100.65",  # Your PC's wired IP
             "serverPort": 5000,
             "modbusInterval": 500,
             "networkInterval": 2000
