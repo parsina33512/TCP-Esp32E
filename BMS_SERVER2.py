@@ -8,7 +8,7 @@ app.secret_key = os.urandom(24)
 # ─── in-memory store of ALL packets you ever got ────────────────
 received_data = []             # <--- UNCHANGED
 
-ESP32_IP   = "192.168.100.65"  # send config / FW here
+ESP32_IP   = "169.254.185.250"  # send config / FW here
 ESP32_PORT = 80
 
 # ────────────────────────────────────────────────────────────────
